@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark light">
+<title>Soft | Community manager and early builder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,100..900,0..100&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script>
+  /* Theme is set before first paint so there's no flash.
+     DEFAULT_THEME: "system" follows the viewer's device, or force "dark" (the stage) / "light" (daylight). */
+  (function () {
+    var DEFAULT_THEME = "system";
+    var saved = null;
+    try { saved = localStorage.getItem("soft-theme"); } catch (e) {}
+    var t = saved || (DEFAULT_THEME !== "system" ? DEFAULT_THEME : null);
+    if (t === "dark" || t === "light") document.documentElement.setAttribute("data-theme", t);
+  })();
+</script>
+<style>
+  /* Two looks for one identity.
+     Stage (dark): oxblood house, champagne text, brass light.
+     Daylight (light): champagne paper, oxblood ink, claret accent. */
+  :root {
+    --serif: "Fraunces", Georgia, "Times New Roman", serif;
+    --sans: "Hanken Grotesk", "Helvetica Neue", Arial, sans-serif;
+
+    /* stage (default) */
+    --bg: #2B0F1B;
+    --surface: #3A1727;
+    --ink: #F2E4CF;
+    --muted: #C7AE9B;
+    --line: rgba(242,228,207,.22);
+    --accent: #E0A93B;
+    --on-accent: #2B0F1B;
+    --glow: rgba(224,169,59,.20);
+
+    color-scheme: dark;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) {
+      --bg: #F3E9D8;
+      --surface: #E8D9C0;
+      --ink: #2B0F1B;
+      --muted: #6A4C49;
+      --line: rgba(43,15,27,.22);
+      --accent: #8A1F3D;
+      --on-accent: #F8EEDC;
+      --glow: rgba(224,169,59,.38);
+      color-scheme: light;
+    }
+  }
+  :root[data-theme="light"] {
+    --bg: #F3E9D8;
+    --surface: #E8D9C0;
+    --ink: #2B0F1B;
+    --muted: #6A4C49;
+    --line: rgba(43,15,27,.22);
+    --accent: #8A1F3D;
+    --on-accent: #F8EEDC;
+    --glow: rgba(224,169,59,.38);
+    color-scheme: light;
+  }
+  :root[data-theme="dark"] {
+    --bg: #2B0F1B;
+    --surface: #3A1727;
+    --ink: #F2E4CF;
+    --muted: #C7AE9B;
+    --line: rgba(242,228,207,.22);
+    --accent: #E0A93B;
+    --on-accent: #2B0F1B;
+    --glow: rgba(224,169,59,.20);
+    color-scheme: dark;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  * { transition: background-color .5s ease, border-color .5s ease, color .3s ease; }
+  html { scroll-padding-top: calc(env(safe-area-inset-top, 0px) + 80px); scroll-behavior: smooth; background: var(--bg); }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 1.05rem;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; text-underline-offset: 4px; text-decoration-thickness: 1px; }
+  a:hover { color: var(--accent); text-decoration-thickness: 2px; }
+  a:focus-visible, button:focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+  ::selection { background: var(--accent); color: var(--on-accent); }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; position: relative; }
+
+  /* ---------- Top bar ---------- */
+  .bar-top {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+  .bar-top .wrap { display: flex; align-items: center; gap: 20px; height: 60px; }
+  .mark {
+    flex: none;
+    font-family: var(--serif);
+    font-variation-settings: "opsz" 60, "wght" 720, "SOFT" 0;
+    font-size: 1.75rem;
+    line-height: 1;
+    letter-spacing: -.035em;
+    text-decoration: none;
+    color: var(--ink);
+    padding: 4px 0;
+  }
+  .mark .dot { color: var(--accent); }
+  .mark:hover { color: var(--ink); }
+  .nav { display: flex; gap: 22px; margin-left: auto; overflow-x: auto; scrollbar-width: none; font-size: .95rem; font-weight: 500; min-width: 0; }
+  .nav::-webkit-scrollbar { display: none; }
+  .nav a { flex: none; text-decoration: none; padding: 4px 0; }
+  .nav a:hover { color: var(--accent); }
+  .theme {
+    flex: none;
+    display: inline-flex; align-items: center; gap: 8px;
+    font: inherit; font-size: .9rem; font-weight: 600;
+    color: var(--ink);
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 6px 14px 6px 10px;
+    cursor: pointer;
+  }
+  .theme:hover { border-color: var(--ink); }
+  .theme svg { display: block; }
+  @media (max-width: 560px) { .bar-top .wrap { gap: 14px; } .mark { font-size: 1.55rem; } .nav { gap: 18px; } .theme span { display: none; } .theme { padding: 8px; } }
+
+  /* ---------- Hero ---------- */
+  .hero { position: relative; overflow: hidden; padding: clamp(36px, 7vw, 88px) 0 clamp(48px, 7vw, 96px); }
+  .hero::before {
+    content: "";
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 55% 70% at var(--sx, 32%) var(--sy, 38%), var(--glow), transparent 70%);
+    pointer-events: none;
+  }
+  .name {
+    margin: 0;
+    font-family: var(--serif);
+    font-size: clamp(7rem, 34vw, 28rem);
+    line-height: .78;
+    letter-spacing: -.035em;
+    font-variation-settings: "opsz" 144, "wght" 250, "SOFT" 0;
+    transition: font-variation-settings 1s cubic-bezier(.2,.8,.2,1), color .3s ease;
+    animation: rise 1.8s cubic-bezier(.2,.8,.2,1) backwards;
+    padding-bottom: .06em;
+    cursor: default;
+    width: fit-content;
+  }
+  .name:hover { font-variation-settings: "opsz" 144, "wght" 520, "SOFT" 100; }
+  @keyframes rise {
+    from { font-variation-settings: "opsz" 144, "wght" 100, "SOFT" 100; opacity: 0; letter-spacing: .02em; }
+    35% { opacity: 1; }
+  }
+  .hero-row {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 32px 56px;
+    margin-top: clamp(28px, 4vw, 52px);
+    align-items: start;
+  }
+  .statement {
+    font-family: var(--serif);
+    font-variation-settings: "opsz" 36, "wght" 380, "SOFT" 30;
+    font-size: clamp(1.5rem, 3vw, 2.25rem);
+    line-height: 1.2;
+    letter-spacing: -.01em;
+    margin: 0;
+    max-width: 24ch;
+  }
+  .hero-side p { margin: 0 0 16px; color: var(--muted); max-width: 44ch; }
+  .links { display: flex; flex-wrap: wrap; gap: 8px 22px; font-weight: 600; }
+  .hero-side .links { gap: 10px; }
+  .hero-side .links a {
+    display: inline-block;
+    text-decoration: none;
+    border: 1.5px solid var(--accent);
+    color: var(--ink);
+    border-radius: 999px;
+    padding: 7px 20px;
+    line-height: 1.3;
+  }
+  .hero-side .links a:hover { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+  @media (max-width: 800px) { .hero-row { grid-template-columns: 1fr; } }
+
+  /* ---------- Shared ---------- */
+  .section { padding: clamp(44px, 6vw, 96px) 0; border-top: 1px solid var(--line); }
+  .h2 {
+    font-family: var(--serif);
+    font-variation-settings: "opsz" 72, "wght" 300, "SOFT" 0;
+    font-size: clamp(2rem, 4.6vw, 3.4rem);
+    line-height: 1.04;
+    letter-spacing: -.02em;
+    margin: 0 0 clamp(24px, 3.5vw, 44px);
+    max-width: 20ch;
+  }
+  .two { display: grid; grid-template-columns: 1fr 1.15fr; gap: clamp(28px, 5vw, 80px); }
+  @media (max-width: 800px) { .two { grid-template-columns: 1fr; } }
+  .two .h2 { margin-bottom: 0; }
+  .plain { margin: 0 0 1em; max-width: 52ch; color: var(--muted); }
+
+  /* ---------- What Soft does ---------- */
+  .do { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; column-gap: 40px; border-top: 1px solid var(--line); }
+  .do li { padding: 16px 0; border-bottom: 1px solid var(--line); }
+  .do b { display: block; font-weight: 650; }
+  .do span { color: var(--muted); font-size: .98rem; }
+  @media (max-width: 640px) { .do { grid-template-columns: 1fr; } }
+
+  /* ---------- Experience ---------- */
+  .xp { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+  .xp li { display: grid; grid-template-columns: 240px 1fr; gap: 8px 32px; padding: 24px 0; border-bottom: 1px solid var(--line); align-items: start; }
+  .xp-name { font-family: var(--serif); font-variation-settings: "opsz" 36, "wght" 420, "SOFT" 30; font-size: 1.55rem; line-height: 1.15; letter-spacing: -.01em; }
+  .xp-role { display: block; margin-top: 6px; color: var(--accent); font-weight: 600; font-size: .98rem; }
+  .xp-tag {
+    display: inline-block; margin-top: 10px;
+    font-size: .8rem; font-weight: 650;
+    background: var(--accent); color: var(--on-accent);
+    border-radius: 999px; padding: 2px 10px;
+  }
+  .xp-period { display: block; margin-top: 8px; color: var(--muted); font-size: .9rem; }
+  .xp p { margin: 0; max-width: 56ch; }
+  @media (max-width: 640px) { .xp li { grid-template-columns: 1fr; } }
+
+  /* ---------- Run of show (a real sequence) ---------- */
+  .cues { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+  .cues li { display: grid; grid-template-columns: 220px 1fr; gap: 8px 32px; padding: 22px 0; border-bottom: 1px solid var(--line); align-items: baseline; }
+  .cue-name {
+    font-family: var(--serif);
+    font-variation-settings: "opsz" 36, "wght" 380, "SOFT" 30;
+    font-size: 1.5rem;
+    letter-spacing: -.01em;
+    color: var(--accent);
+  }
+  .cues p { margin: 0; max-width: 56ch; }
+  @media (max-width: 640px) { .cues li { grid-template-columns: 1fr; } }
+
+  /* ---------- Range ---------- */
+  .range { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+  .range li { display: grid; grid-template-columns: 220px 1fr; gap: 6px 32px; padding: 18px 0; border-bottom: 1px solid var(--line); align-items: baseline; }
+  .range b { font-family: var(--serif); font-variation-settings: "opsz" 36, "wght" 400, "SOFT" 30; font-weight: 400; font-size: 1.3rem; letter-spacing: -.01em; }
+  .range span { color: var(--muted); max-width: 56ch; }
+  @media (max-width: 640px) { .range li { grid-template-columns: 1fr; } }
+
+  /* ---------- Tools ---------- */
+  .tools { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+  .tools li { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 6px 14px; font-size: .95rem; font-weight: 500; }
+
+  /* ---------- Motion ---------- */
+  .rows { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+  .rows .row { display: grid; grid-template-columns: 1fr auto; gap: 4px 20px; padding: 18px 0; border-bottom: 1px solid var(--line); text-decoration: none; }
+  .rows a.row:hover .rt { color: var(--accent); }
+  .rt { font-family: var(--serif); font-variation-settings: "opsz" 36, "wght" 400, "SOFT" 30; font-size: 1.35rem; letter-spacing: -.01em; }
+  .rm { color: var(--muted); font-size: .95rem; align-self: center; text-align: right; }
+  .rd { grid-column: 1 / -1; color: var(--muted); font-size: .98rem; }
+
+  /* ---------- Contact ---------- */
+  .contact { padding: clamp(56px, 8vw, 112px) 0 clamp(72px, 10vw, 140px); border-top: 1px solid var(--line); }
+  .contact h2 {
+    font-family: var(--serif);
+    font-variation-settings: "opsz" 144, "wght" 250, "SOFT" 0;
+    font-size: clamp(2.6rem, 8.5vw, 6.6rem);
+    line-height: .96;
+    letter-spacing: -.03em;
+    margin: 0 0 32px;
+    max-width: 14ch;
+  }
+  .contact .links { font-size: 1.15rem; }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    * { transition-duration: 0s !important; }
+    .name { animation: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="bar-top">
+  <div class="wrap">
+    <a class="mark" href="#top" aria-label="Soft, back to top">Soft<span class="dot" aria-hidden="true">.</span></a>
+    <nav class="nav" aria-label="Sections">
+      <a href="#do">What I do</a>
+      <a href="#experience">Experience</a>
+      <a href="#show">Run of show</a>
+      <a href="#range">Range</a>
+      <a href="#craft">Motion</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <button class="theme" id="themeBtn" type="button">
+      <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 1.5a6.5 6.5 0 0 0 0 13z" fill="currentColor"/></svg>
+      <span id="themeLabel">Light</span>
+    </button>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero" id="hero">
+    <div class="wrap">
+      <h1 class="name" id="name">Soft</h1>
+      <div class="hero-row">
+        <p class="statement" id="statement"></p>
+        <div class="hero-side">
+          <p id="heroNote"></p>
+          <div class="links" id="heroLinks"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="do">
+    <div class="wrap two">
+      <h2 class="h2" id="doTitle"></h2>
+      <ul class="do" id="doList"></ul>
+    </div>
+  </section>
+
+  <section class="section" id="experience">
+    <div class="wrap two">
+      <h2 class="h2" id="expTitle"></h2>
+      <ul class="xp" id="xpList"></ul>
+    </div>
+  </section>
+
+  <section class="section" id="show">
+    <div class="wrap two">
+      <div>
+        <h2 class="h2" id="showTitle"></h2>
+        <p class="plain" id="showNote" style="margin-top: 20px"></p>
+      </div>
+      <ol class="cues" id="cues"></ol>
+    </div>
+  </section>
+
+  <section class="section" id="range">
+    <div class="wrap two">
+      <div>
+        <h2 class="h2" id="rangeTitle"></h2>
+        <p class="plain" id="rangeNote" style="margin-top: 20px"></p>
+      </div>
+      <ul class="range" id="rangeList"></ul>
+    </div>
+  </section>
+
+  <section class="section" id="craft">
+    <div class="wrap two">
+      <div>
+        <h2 class="h2" id="craftTitle"></h2>
+        <p class="plain" id="craftNote" style="margin-top: 20px"></p>
+      </div>
+      <ul class="rows" id="craftRows"></ul>
+    </div>
+  </section>
+
+  <section class="section" id="tools-section">
+    <div class="wrap two">
+      <h2 class="h2" id="toolTitle"></h2>
+      <ul class="tools" id="tools"></ul>
+    </div>
+  </section>
+
+  <section class="contact" id="contact">
+    <div class="wrap">
+      <h2 id="contactTitle"></h2>
+      <div class="links" id="contactLinks"></div>
+    </div>
+  </section>
+</main>
+
+<script>
+/* =====================================================
+   EDIT THIS BLOCK. Everything on the page reads from it.
+   ===================================================== */
+const SITE = {
+  statement: "Community manager and moderator. Polished, on time, and steady when the room gets loud.",
+  heroNote: "Community manager, early builder and creative voice in NFT communities.",
+
+  links: [
+    { label: "X", href: "https://x.com/softeth" },
+    { label: "Discord", href: "https://discord.gg/Hynz7xGh" },
+    { label: "Telegram", href: "https://t.me/uncsoft" },
+    { label: "Email", href: "mailto:victorsoft8@gmail.com" }
+  ],
+
+  doing: {
+    title: "Hosted with ease, moderated without a wobble.",
+    items: [
+      ["Accurate GTD and FCFS spots", "guaranteed and first-come-first-served mint spots, checked so early supporters and builders get what they earned"],
+      ["Connecting community and artist", "members and minters heard by the people making the work"],
+      ["Live chat moderation", "questions surfaced, noise filtered"],
+      ["Scam and impersonator defence", "fake support, phishing links, cloned profiles"],
+      ["Onboarding and verification", "clear first steps that keep new members"],
+      ["Building communities from day one", "early builder and community shaper in NFT circles"]
+    ]
+  },
+
+  experience: {
+    title: "Where Soft has been building",
+    // Optional per entry: period: "2023 to now" (shown under the role). status: "Current" adds a tag.
+    entries: [
+      {
+        name: "Hood Street Circle",
+        role: "Early builder and community shaper",
+        status: "Current",
+        desc: "One of the early builders and community shapers of an NFT-based group chat that brings together NFT artists, lovers of digital art and minters."
+      },
+      {
+        name: "Wot Cabal",
+        role: "Community manager",
+        desc: "Connects community members and minters with the artist, and makes sure early supporters and builders get accurate guaranteed (GTD) and first-come-first-served (FCFS) spots, so everything runs smoothly."
+      },
+      {
+        name: "Wot Cabal",
+        role: "Artist team",
+        desc: "Part of the artist team, improving the NFT art and making each piece stand out."
+      }
+    ]
+  },
+
+  show: {
+    title: "A run of show for every community moment",
+    note: "Announcements, AMAs, mints and launches all follow the same shape. Here is how Soft runs one.",
+    cues: [
+      ["One week out", "Brief the speakers, agree the rules of the room and give the mod team a written plan with a backup."],
+      ["Doors open", "Open the channel, welcome early arrivals and sweep for impersonators before the crowd arrives."],
+      ["Live", "Run the chat, surface the best questions and keep the tone steady while the host stays on script."],
+      ["Curtain call", "Post the recap the same day, thank the speakers and note what to change next time."]
+    ]
+  },
+
+  range: {
+    title: "The same standards in every room",
+    note: "Soft changes register to suit the audience, and never lowers the bar.",
+    rows: [
+      ["Open communities", "Warm, present and a little playful in everyday Discord and Telegram servers."],
+      ["Support and safety", "Calm, exact and quick on tickets, rules and scam defence."],
+      ["Hyperliquid and trading", "Fast and level-headed when markets move. Signal over noise, and no financial advice."],
+      ["NFT projects", "Considered and culture-first: holder verification, artist collabs and mint day."]
+    ]
+  },
+
+  craft: {
+    title: "Also shapes the motion",
+    note: "Motion and design are part of how Soft helps a project feel finished.",
+    // href is optional. Add one and the row becomes a link (X post, Vimeo, YouTube, Behance...)
+    rows: [
+      {
+        title: "Wot Cabal",
+        tag: "Motion graphics and design",
+        desc: "Soft's ideas were a huge part of all the motion graphics and designs for the project.",
+        href: ""
+      }
+    ]
+  },
+
+  toolsTitle: "Tools of the trade",
+  tools: ["Discord", "Telegram", "Collab.Land", "Wick", "Carl-bot", "Rose", "X Spaces", "Notion"],
+
+  contactTitle: "Got a room that needs holding?"
+};
+
+/* =====================================================
+   Rendering
+   ===================================================== */
+const $ = (id) => document.getElementById(id);
+const isExternal = (h) => h.startsWith("http");
+const linkHTML = (l) => `<a href="${l.href}" ${isExternal(l.href) ? 'target="_blank" rel="noopener"' : ""}>${l.label}</a>`;
+
+$("statement").textContent = SITE.statement;
+$("heroNote").textContent = SITE.heroNote;
+$("heroLinks").innerHTML = SITE.links.map(linkHTML).join("");
+$("contactLinks").innerHTML = SITE.links.map(linkHTML).join("");
+$("contactTitle").textContent = SITE.contactTitle;
+
+$("doTitle").textContent = SITE.doing.title;
+$("doList").innerHTML = SITE.doing.items.map(i => `<li><b>${i[0]}</b><span>${i[1]}</span></li>`).join("");
+
+$("expTitle").textContent = SITE.experience.title;
+$("xpList").innerHTML = SITE.experience.entries.map(e => `
+  <li>
+    <div>
+      <span class="xp-name">${e.name}</span>
+      <span class="xp-role">${e.role}</span>
+      ${e.period ? `<span class="xp-period">${e.period}</span>` : ""}
+      ${e.status ? `<span class="xp-tag">${e.status}</span>` : ""}
+    </div>
+    <p>${e.desc}</p>
+  </li>`).join("");
+
+$("showTitle").textContent = SITE.show.title;
+$("showNote").textContent = SITE.show.note;
+$("cues").innerHTML = SITE.show.cues.map(c => `<li><span class="cue-name">${c[0]}</span><p>${c[1]}</p></li>`).join("");
+
+$("rangeTitle").textContent = SITE.range.title;
+$("rangeNote").textContent = SITE.range.note;
+$("rangeList").innerHTML = SITE.range.rows.map(r => `<li><b>${r[0]}</b><span>${r[1]}</span></li>`).join("");
+
+$("craftTitle").textContent = SITE.craft.title;
+$("craftNote").textContent = SITE.craft.note;
+$("craftRows").innerHTML = SITE.craft.rows.map(r => {
+  const inner = `<span class="rt">${r.title}</span><span class="rm">${r.tag}</span><span class="rd">${r.desc}</span>`;
+  return r.href
+    ? `<li><a class="row" href="${r.href}" ${isExternal(r.href) ? 'target="_blank" rel="noopener"' : ""}>${inner}</a></li>`
+    : `<li><div class="row">${inner}</div></li>`;
+}).join("");
+
+$("toolTitle").textContent = SITE.toolsTitle;
+$("tools").innerHTML = SITE.tools.map(t => `<li>${t}</li>`).join("");
+
+/* ---------- Theme toggle ---------- */
+(function theme(){
+  const root = document.documentElement;
+  const mq = window.matchMedia("(prefers-color-scheme: light)");
+  const btn = $("themeBtn"), label = $("themeLabel");
+  const effective = () => root.getAttribute("data-theme") || (mq.matches ? "light" : "dark");
+  function paint(){
+    const next = effective() === "light" ? "dark" : "light";
+    label.textContent = next === "light" ? "Light" : "Dark";
+    btn.setAttribute("aria-label", "Switch to " + next + " theme");
+  }
+  btn.addEventListener("click", () => {
+    const next = effective() === "light" ? "dark" : "light";
+    root.setAttribute("data-theme", next);
+    try { localStorage.setItem("soft-theme", next); } catch (e) {}
+    paint();
+  });
+  mq.addEventListener("change", paint);
+  paint();
+})();
+
+/* ---------- Spotlight: the light in the hero follows the pointer ---------- */
+(function spotlight(){
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const hero = $("hero");
+  let raf = null, x = 32, y = 38;
+  hero.addEventListener("pointermove", e => {
+    const r = hero.getBoundingClientRect();
+    x = ((e.clientX - r.left) / r.width) * 100;
+    y = ((e.clientY - r.top) / r.height) * 100;
+    if (!raf) raf = requestAnimationFrame(() => {
+      hero.style.setProperty("--sx", x + "%");
+      hero.style.setProperty("--sy", y + "%");
+      raf = null;
+    });
+  });
+})();
+</script>
+</body>
+</html>
